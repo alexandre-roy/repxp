@@ -4,72 +4,122 @@
 
 {% endblock %} {% block navigation %}
 
-<a href="{% url 'index' %}" class="active-link">CLASSEMENT</a>
+<a href="{% url 'index' %}" class="active-link">CLASSEMENT{% if user.is_authenticated %} ET DÉFIS DE LA SEMAINE{% endif %}</a>
 
 {% endblock %} {% block main %}
 
-<div class="container mt-3">
-    {% if classement %}
-        <table class="table">
-            <thead class="bluee">
-                <tr>
-                    <th scope="col" class="text-center">Rang</th>
-                    <th scope="col">Utilisateur</th>
-                    <th scope="col" class="text-center">
-                        <a href="?sort=badges_obtenus" class="text-decoration-none {% if current_sort == 'badges_obtenus' %}style-button-link{% endif %}">
-                            Badges
-                        </a>
-                    </th>
-                    <th scope="col" class="text-center">
-                        <a href="?sort=reps_effectuees" class="text-decoration-none {% if current_sort == 'reps_effectuees' %}style-button-link{% endif %}">
-                            Répétitions
-                        </a>
-                    </th>
-                    <th scope="col" class="text-center">
-                        <a href="?sort=sets_effectues" class="text-decoration-none {% if current_sort == 'sets_effectues' %}style-button-link{% endif %}">
-                            Séries
-                        </a>
-                    </th>
-                    <th scope="col" class="text-center">
-                        <a href="?sort=entrainements_completes" class="text-decoration-none {% if current_sort == 'entrainements_completes' %}style-button-link{% endif %}">
-                            Entraînements
-                        </a>
-                    </th>
-                    <th scope="col" class="text-center">
-                        <a href="?sort=exercices_completes" class="text-decoration-none {% if current_sort == 'exercices_completes' %}style-button-link{% endif %}">
-                            Exercices
-                        </a>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for personne in classement %}
-                <tr>
-                    <td class="text-center">
-                        {% if personne.rang == 1 %}
-                            <span class="badge bg-warning text-dark">1er</span>
-                        {% elif personne.rang == 2 %}
-                            <span class="badge bg-secondary">2e</span>
-                        {% elif personne.rang == 3 %}
-                            <span class="badge bg-brown">3e</span>
-                        {% else %}
-                            <span class="badge bg-light text-dark">{{ personne.rang }}e</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <a href="{% url 'view_other_user_profile' personne.user.id %}" class="text-decoration-none"><img src="{{ personne.user.avatar.url }}" alt="pfp" class="rounded-circle me-2 edit-img"><strong>{{ personne.user }}</strong></a>
-                    </td>
-                    <td class="text-center">{{ personne.badges_obtenus }}</td>
-                    <td class="text-center">{{ personne.reps_effectuees }}</td>
-                    <td class="text-center">{{ personne.sets_effectues }}</td>
-                    <td class="text-center">{{ personne.entrainements_completes }}</td>
-                    <td class="text-center">{{ personne.exercices_completes }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p class="text-center">Aucun classement enregistré pour l'instant.</p>
-    {% endif %}
+<div class="container-fluid mt-3">
+    <div class="row">
+        <div class="{% if user.is_authenticated %}col-lg-8{% else %} col-lg-12{% endif %}">
+            {% if classement %}
+                <div class="border rounded overflow-hidden">
+                    <table class="table table-striped table-borderless mb-0">
+                        <thead class="bluee">
+                            <tr>
+                            <th scope="col" class="text-center">Rang</th>
+                            <th scope="col">Utilisateur</th>
+                            <th scope="col" class="text-center">
+                                <a href="?sort=badges_obtenus" class="text-decoration-none {% if current_sort == 'badges_obtenus' %}style-button-link{% endif %}">
+                                    Badges
+                                </a>
+                            </th>
+                            <th scope="col" class="text-center">
+                                <a href="?sort=reps_effectuees" class="text-decoration-none {% if current_sort == 'reps_effectuees' %}style-button-link{% endif %}">
+                                    Répétitions
+                                </a>
+                            </th>
+                            <th scope="col" class="text-center">
+                                <a href="?sort=sets_effectues" class="text-decoration-none {% if current_sort == 'sets_effectues' %}style-button-link{% endif %}">
+                                    Séries
+                                </a>
+                            </th>
+                            <th scope="col" class="text-center">
+                                <a href="?sort=entrainements_completes" class="text-decoration-none {% if current_sort == 'entrainements_completes' %}style-button-link{% endif %}">
+                                    Entraînements
+                                </a>
+                            </th>
+                            <th scope="col" class="text-center">
+                                <a href="?sort=exercices_completes" class="text-decoration-none {% if current_sort == 'exercices_completes' %}style-button-link{% endif %}">
+                                    Exercices
+                                </a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for personne in classement %}
+                        <tr>
+                            <td class="text-center">
+                                {% if personne.rang == 1 %}
+                                    <span class="badge bg-warning text-dark">1er</span>
+                                {% elif personne.rang == 2 %}
+                                    <span class="badge bg-secondary">2e</span>
+                                {% elif personne.rang == 3 %}
+                                    <span class="badge bg-brown">3e</span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark">{{ personne.rang }}e</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'view_other_user_profile' personne.user.id %}" class="text-decoration-none"><img src="{{ personne.user.avatar.url }}" alt="pfp" class="rounded-circle me-2 edit-img"><strong>{{ personne.user }}</strong></a>
+                            </td>
+                            <td class="text-center">{{ personne.badges_obtenus }}</td>
+                            <td class="text-center">{{ personne.reps_effectuees }}</td>
+                            <td class="text-center">{{ personne.sets_effectues }}</td>
+                            <td class="text-center">{{ personne.entrainements_completes }}</td>
+                            <td class="text-center">{{ personne.exercices_completes }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+            {% else %}
+                <p class="text-center">Aucun classement enregistré pour l'instant.</p>
+            {% endif %}
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="col-lg-4">
+            <div class="card border">
+                <div class="card-header bluee">
+                    <strong><a class="mb-0 text-decoration-none">Défis actifs</a></strong>
+                </div>
+                <div class="card-body bg-body-secondary pb-0">
+                    {% if defis_actifs %}
+                        {% for defi in defis_actifs %}
+                        <div class="mb-3 p-3 border rounded bg-light">
+                            <p class="fw-bold text-blue mb-1">
+                                {{ defi.nom }}{% if defi.is_complete %} <span class="text-success">- Complété</span>{% endif %}
+                            </p>
+                            <p class="small mb-2">
+                                Expire le {{ defi.date_limite|date:"d/m/Y" }}
+                            </p>
+                            {% if defi.badges %}
+                            <div class="badges-list">
+                                <strong><p class="small mb-2">Badges à obtenir :</p></strong>
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% for badge in defi.badges.all %}
+                                    <div class="d-flex align-items-center bg-body-secondary p-2 rounded">
+                                        {% if badge.icone %}
+                                        <img src="{{ badge.icone.url }}" alt="icone" class="me-2 edit-img border rounded">
+                                        {% endif %}
+                                        <div>
+                                            <div class="small fw-bold">{{ badge.nom }}</div>
+                                            <div>{{ badge.categorie }}</div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted text-center my-4">Aucun défi actif pour le moment</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}

@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, get_user_model
 from django.contrib import messages
+from django.utils import timezone
 from django.core.paginator import Paginator
 from .forms import ExerciceForm, RegisterForm, ConnexionForm, EntrainementForm, UserSearchForm, CustomUserChangeForm, BadgeForm, DefiForm
-from .models import Exercice, ExerciceEntrainement, User, Entrainement, Badge, GroupeMusculaire, Statistiques, DefiBadge
+from .models import Exercice, ExerciceEntrainement, User, Entrainement, Badge, GroupeMusculaire, Statistiques, DefiBadge, Defis, UserBadgeProgress
 
 # Create your views here.
 def est_admin(user):
@@ -35,7 +36,34 @@ def index(request):
         })
         rang += 1
 
-    return render(request, "site_web/index.html", {"est_admin": est_admin(request.user),"classement": classement, "current_sort": sort_by})
+    defis_actifs = (
+        Defis.objects.filter(date_limite__gte=timezone.now())
+        .prefetch_related("badges")
+        .order_by("date_limite")
+    )
+
+    if request.user.is_authenticated:
+
+        for defi in defis_actifs:
+            completed = UserBadgeProgress.objects.filter(
+                user_id=request.user,
+                defi_id=defi,
+                est_complete=True
+            ).count()
+
+            total_badges = defi.badges.count()
+
+            if total_badges > 0 and completed == total_badges:
+                defi.is_complete = True
+            else:
+                defi.is_complete = False
+
+    return render(request, "site_web/index.html", {
+        "est_admin": est_admin(request.user),
+        "classement": classement,
+        "current_sort": sort_by,
+        "defis_actifs": defis_actifs
+    })
 
 def register(request):
     if request.method == 'POST':
